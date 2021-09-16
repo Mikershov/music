@@ -1,6 +1,6 @@
 <template>
   <div class="remix">
-    {{genre.sounds}}
+   <!-- {{genre.sounds}}
     <hr>
     1) тег - источник файла<br>
     2) подключение источника к контексту звука<br>
@@ -13,15 +13,13 @@
     {{mainLine}}
     <hr>
     {{mainLine.curTime}} / {{mainLine.time}}
+    <hr>
+    <canvas id="output" height="500" width="500"></canvas>-->
 
     <audio id="mainLine" :src="`samples-mp3/${genreName}/${mainLine.name}/${mainLine.file}`"></audio>
 
     <div  class="remix__header">
       <div class="remix__block">
-        <button @click="mainLinePlay" class="btn-play">
-          <i class="fas fa-play"></i>
-        </button>
-
         <div class="remix__author">DJ's name</div>
         <div class="remix__name">Song Name</div>
 
@@ -30,10 +28,15 @@
           <div class="volume__track"></div>
           <div class="volume__thumb" style="left: 100%"></div>
         </div>
+
+        <button @click="mainLinePlay" class="btn-play">
+          <i v-if="!mainLine.playing" class="fas fa-play"></i>
+          <i v-if="mainLine.playing" class="fas fa-stop"></i>
+        </button>
       </div>
 
       <div class="remix__canvas">
-        <div class="remix__divider divider" style="left: 0%">
+        <div class="remix__divider divider" v-bind:style="{left: mainLine.slider+'%'}">
           <img class="divider__before" src="images/arrow-bottom.svg" alt=""/>
           <div class="divider__line"></div>
           <img class="divider__after" src="images/arrow-top.svg" alt=""/>
@@ -129,6 +132,7 @@
 </template>
 
 <script>
+import Wave from "@foobar404/wave";
 export default {
   name: 'Player',
 
@@ -148,7 +152,7 @@ export default {
       genre: {},
       sounds: [],
       soundCounter: 0,
-      mainLine: { icon: "main", file: "", name: "", time: 0, curTime: 0, playing: false, source: {}, track:{}, gainNode: {} },
+      mainLine: { icon: "main", file: "", name: "", time: 0, curTime: 0, slider: 0, playing: false, source: {}, track:{}, gainNode: {} },
       auCon: {}
     }
   },
@@ -163,7 +167,7 @@ export default {
     });
     this.mainLine.name = mainLineName;
     this.mainLine.file = this.$store.getters.genres[this.genreName].sounds[mainLineName].file;
-    this.mainLine.time = this.$store.getters.genres[this.genreName].time;
+    //this.mainLine.time = this.$store.getters.genres[this.genreName].time;
   },
 
   mounted() {
@@ -181,7 +185,27 @@ export default {
     //автопереключение в конце трека
     this.mainLine.source.addEventListener('ended', () => {
       this.mainLine.playing = false;
+      this.mainLine.source.currentTime = 0;
     }, false);
+
+    //таймеры и визуализация
+    this.loop();
+
+    let wave = new Wave();
+
+    navigator.mediaDevices.getUserMedia({
+      audio: true
+    })
+            .then(function (stream) {
+              console.log('TEST')
+              wave.fromStream(stream, "output", {
+                type: "bars",
+                colors: ["red", "white", "blue"]
+              });
+            })
+            .catch(function (err) {
+              console.log(err.message)
+            });
   },
 
   methods: {
@@ -205,8 +229,36 @@ export default {
 
       } else if (this.mainLine.playing === true) {
         this.mainLine.source.pause();
+        this.mainLine.source.currentTime = 0;
         this.mainLine.playing = false;
       }
+    },
+
+    loop() {
+      window.requestAnimationFrame(this.loop);
+
+      //слайдер главного трека
+      this.mainLine.slider = this.mainLine.source.currentTime/this.mainLine.source.duration*100;
+
+      //визуализация
+      //arrayMain = new Uint8Array(analyserMain.frequencyBinCount);
+      //analyserMain.getByteFrequencyData(arrayMain);
+      //mainVis.width = (arrayMain[40])+"px";
+
+      //таймер
+      this.mainLine.curTime = this.mainLine.source.currentTime.toFixed(2);
+      this.mainLine.time = this.mainLine.source.duration.toFixed(2);
+
+     /* //подключение второстепенных дорожек от времени основной
+      if(audioElement.currentTime >= guitarTimeStart && audioElement.currentTime <= guitarTimeEnd) {
+        guitar.play();
+        playBtnGuitar.dataset.playing = 'true';
+        playBtnGuitar.innerText = 'Stop';
+      } else {
+        guitar.pause();
+        playBtnGuitar.dataset.playing = 'false';
+        playBtnGuitar.innerText = 'Start';
+      }*/
     }
   }
 
@@ -219,18 +271,29 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 35px;
+    width: 65px;
     height: 35px;
-    padding: 10px 5px 10px 10px;
-    font-size: 20px;
-    border: 1px solid #fb2f24;
-    border-radius: 50%;
-    background-color: transparent;
+    color: #2c2733;
+    font-size: 18px;
+    border: 1px solid #fffcf9;
+    border-radius: 30px;
+    background-color: #fffcf9;
     cursor: pointer;
     transition: background-color 300ms;
+    position: absolute;
+    top: 11px;
+    right: 0;
   }
 
   hr {
     margin: 10px 0;
+  }
+
+  .remix__block {
+    position: relative;
+  }
+
+  .remix__divider {
+    transform: translate(-50%, -50%);
   }
 </style>
