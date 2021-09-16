@@ -1,6 +1,6 @@
 <template>
   <div class="remix">
-   <!-- {{genre.sounds}}
+    {{genre.sounds}}
     <hr>
     1) тег - источник файла<br>
     2) подключение источника к контексту звука<br>
@@ -9,12 +9,11 @@
     5) логика плей/пауза/стоп <br>
     6) дополнительная логика (переключение в конце, сброс остальных треков при достижении конца основного) <br>
     7) визуализация
-    <hr>
+    <!--<hr>
     {{mainLine}}
     <hr>
     {{mainLine.curTime}} / {{mainLine.time}}
-    <hr>
-    <canvas id="output" height="500" width="500"></canvas>-->
+    <hr>-->
 
     <audio id="mainLine" :src="`samples-mp3/${genreName}/${mainLine.name}/${mainLine.file}`"></audio>
 
@@ -43,7 +42,7 @@
         </div>
 
         <div class="remix__analyser">
-          <img src="images/analyser.png" alt="analyser" />
+          <canvas id="mainLineVis" style="width: 100%; height:50px"></canvas>
         </div>
       </div>
     </div>
@@ -132,7 +131,6 @@
 </template>
 
 <script>
-import Wave from "@foobar404/wave";
 export default {
   name: 'Player',
 
@@ -152,7 +150,7 @@ export default {
       genre: {},
       sounds: [],
       soundCounter: 0,
-      mainLine: { icon: "main", file: "", name: "", time: 0, curTime: 0, slider: 0, playing: false, source: {}, track:{}, gainNode: {} },
+      mainLine: { icon: "main", file: "", name: "", time: 0, curTime: 0, slider: 0, playing: false, source: {}, track:{}, gainNode: {}, analyser: {}, canvas: {} },
       auCon: {}
     }
   },
@@ -167,13 +165,12 @@ export default {
     });
     this.mainLine.name = mainLineName;
     this.mainLine.file = this.$store.getters.genres[this.genreName].sounds[mainLineName].file;
-    //this.mainLine.time = this.$store.getters.genres[this.genreName].time;
   },
 
   mounted() {
     this.auCon = new AudioContext;
 
-    //главный трек
+    //основная линия
     //источник
     this.mainLine.source = document.getElementById('mainLine');
     //связывание источника и контекста и вывод в звук
@@ -188,24 +185,22 @@ export default {
       this.mainLine.source.currentTime = 0;
     }, false);
 
+    //анализатор
+    this.mainLine.canvas = document.getElementById('mainLineVis').getContext("2d");
+    this.mainLine.analyser = this.auCon.createAnalyser();
+    this.mainLine.track.connect(this.mainLine.analyser);
+    this.mainLine.analyser.connect(this.auCon.destination);
+    this.mainLine.analyser.fftSize = 1024;
+    this.mainLine.bufferLength = this.mainLine.analyser.frequencyBinCount;
+    this.mainLine.dataArray = new Uint8Array(this.mainLine.bufferLength);
+    this.mainLine.canvasWidth = document.getElementById('mainLineVis').width;
+    this.mainLine.canvasHeight = document.getElementById('mainLineVis').height;
+    this.mainLine.barWidth = (this.mainLine.canvasWidth / this.mainLine.bufferLength) * 2.5;
+    this.mainLine.barHeight = '';
+    this.mainLine.x = 0;
+
     //таймеры и визуализация
     this.loop();
-
-    let wave = new Wave();
-
-    navigator.mediaDevices.getUserMedia({
-      audio: true
-    })
-            .then(function (stream) {
-              console.log('TEST')
-              wave.fromStream(stream, "output", {
-                type: "bars",
-                colors: ["red", "white", "blue"]
-              });
-            })
-            .catch(function (err) {
-              console.log(err.message)
-            });
   },
 
   methods: {
@@ -259,6 +254,29 @@ export default {
         playBtnGuitar.dataset.playing = 'false';
         playBtnGuitar.innerText = 'Start';
       }*/
+
+      this.mainLineVis()
+    },
+
+    mainLineVis() {
+      this.mainLine.x = 0;
+      this.mainLine.analyser.getByteFrequencyData(this.mainLine.dataArray);
+
+      this.mainLine.canvas.fillStyle = "#fecbc8";
+      this.mainLine.canvas.fillRect(0, 0, this.mainLine.canvasWidth, this.mainLine.canvasHeight);
+
+      for (let i = 0; i < this.mainLine.bufferLength; i++) {
+        this.mainLine.barHeight = this.mainLine.dataArray[i];
+
+        let r = this.mainLine.barHeight + (25 * (i/this.mainLine.bufferLength));
+        let g = 250 * (i/this.mainLine.bufferLength);
+        let b = 255;
+
+        this.mainLine.canvas.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+        this.mainLine.canvas.fillRect(this.mainLine.x, this.mainLine.canvasHeight - this.mainLine.barHeight, this.mainLine.barWidth, this.mainLine.barHeight);
+
+        this.mainLine.x += this.mainLine.barWidth + 1;
+      }
     }
   }
 
