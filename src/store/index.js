@@ -35,25 +35,25 @@ export default new Vuex.Store({
       pop: {
         time: 15000,
         sounds: {
-          rhythm: {
-            icon: '3',
-            file: '1.mp3'
-          },
-          synthesizer:{
-            icon: '6',
-            file: '1.mp3'
-          },
+          // rhythm: {
+          //   icon: '3',
+          //   file: '1.mp3'
+          // },
+          // synthesizer:{
+          //   icon: '6',
+          //   file: '1.mp3'
+          // },
           mainline: {
             icon: 'main',
             file: '1.mp3'
           },
-          voice: {
-            icon: '4',
-            file: '5.mp3'
-          },
+          // voice: {
+          //   icon: '4',
+          //   file: '5.mp3'
+          // },
           winds: {
             icon: '2',
-            file: '5.mp3'
+            file: '2mix.mp3'
           }
         },
       },

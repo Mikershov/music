@@ -27,7 +27,7 @@
                 Choose your track, make&nbsp;your remix and share.
               </div>
             </div>
-            <div class="board__item" v-if="active==0">
+            <div class="board__item" v-if="false">
               <div class="board-video" style="background-image: url('images/video-1.jpg')">
                 <div class="user-pane">
                   <div class="user-pane__avatar">
@@ -44,7 +44,7 @@
                 <a class="board-video__btn btn" href="#" @click="active=1; genreName='edm';">Choose</a>
               </div>
             </div>
-            <div class="board__item" v-if="active==0">
+            <div class="board__item" v-if="false">
               <div class="board-video" style="background-image: url('images/video-2.jpg')">
                 <div class="user-pane">
                   <div class="user-pane__avatar">
@@ -78,7 +78,7 @@
                 <a class="board-video__btn btn" href="#" @click="active=3; genreName='pop'">Choose</a>
               </div>
             </div>
-            <div class="board__item" v-if="active==0">
+            <div class="board__item" v-if="false">
               <div class="board-video" style="background-image: url('images/video-1.jpg')">
                 <div class="user-pane">
                   <div class="user-pane__avatar">
