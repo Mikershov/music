@@ -23,7 +23,7 @@
     <div  class="remix__header">
       <div class="remix__block">
         <div class="remix__author">DJ's name</div>
-        <div class="remix__name">Song Name</div>
+        <div class="remix__name" style="text-transform: uppercase">{{ genreName }}</div>
 
         <input class="volume" type="range" name="volume"/>
 
@@ -364,6 +364,19 @@ export default {
   },
 
   watch: {
+    'genreName'(){
+      this.genre = Object.assign({}, this.$store.getters.genres[this.genreName]);
+
+      //основная линия
+      let mainLineName = Object.keys(this.genre.sounds).find(item => {
+        if(this.genre.sounds[item].icon === 'main') {return true}
+      });
+      this.mainLine.name = mainLineName;
+      this.mainLine.file = this.$store.getters.genres[this.genreName].sounds[mainLineName].file;
+
+      this.sounds = [];
+      this.soundCounter=  0;
+    },
     'mainLine.playing'() {
       if(!this.mainLine.playing) {
         this.sounds.forEach(line => {

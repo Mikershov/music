@@ -1,6 +1,120 @@
 <template>
   <div class="music-wrapper">
-    <section class="remix-intro">
+    <section class="board">
+      <div class="board__grid">
+        <div class="board__item board__item--main">
+          <div class="board__img">
+            <img src="images/board-1.jpg" alt="">
+          </div>
+        </div>
+        <div class="board__item">
+          <a class="board__logo" href="#">
+            <img src="images/logo.svg" alt="logotype">
+          </a>
+        </div>
+            <div class="board__item" v-if="active==0">
+              <div class="board__img">
+                <img src="images/board-2.jpg" alt="">
+              </div>
+            </div>
+            <div class="board__item board__item--main" v-if="active==0">
+              <div class="board__welcome">
+                <div class="board__title">Welcome to&nbsp;Soundtastes</div>
+              </div>
+            </div>
+            <div class="board__item" v-if="active==0">
+              <div class="board__notice">
+                Choose your track, make&nbsp;your remix and share.
+              </div>
+            </div>
+            <div class="board__item" v-if="active==0">
+              <div class="board-video" style="background-image: url('images/video-1.jpg')">
+                <div class="user-pane">
+                  <div class="user-pane__avatar">
+                    <img src="images/avatar.jpg" alt="avatar">
+                  </div>
+                  <div class="user-pane__content">
+                    <div class="user-pane__title">
+                      Your user-paneor Name
+                    </div>
+                    <div class="board-video__name">EDM</div>
+                  </div>
+                </div>
+                <img class="board-video__play" src="images/play.svg" alt="">
+                <a class="board-video__btn btn" href="#" @click="active=1; genreName='edm';">Choose</a>
+              </div>
+            </div>
+            <div class="board__item" v-if="active==0">
+              <div class="board-video" style="background-image: url('images/video-2.jpg')">
+                <div class="user-pane">
+                  <div class="user-pane__avatar">
+                    <img src="images/avatar.jpg" alt="avatar">
+                  </div>
+                  <div class="user-pane__content">
+                    <div class="user-pane__title">
+                      Your user-paneor Name
+                    </div>
+                    <div class="board-video__name">Indie</div>
+                  </div>
+                </div>
+                <img class="board-video__play" src="images/play.svg" alt="">
+                <a class="board-video__btn btn" href="#" @click="active=2; genreName='indie'">Choose</a>
+              </div>
+            </div>
+            <div class="board__item" v-if="active==0">
+              <div class="board-video" style="background-image: url('images/video-1.jpg')">
+                <div class="user-pane">
+                  <div class="user-pane__avatar">
+                    <img src="images/avatar.jpg" alt="avatar">
+                  </div>
+                  <div class="user-pane__content">
+                    <div class="user-pane__title">
+                      Your user-paneor Name
+                    </div>
+                    <div class="board-video__name">classic</div>
+                  </div>
+                </div>
+                <img class="board-video__play" src="images/play.svg" alt="">
+                <a class="board-video__btn btn" href="#" @click="active=3; genreName='classic'">Choose</a>
+              </div>
+            </div>
+            <div class="board__item" v-if="active==0">
+              <div class="board-video" style="background-image: url('images/video-1.jpg')">
+                <div class="user-pane">
+                  <div class="user-pane__avatar">
+                    <img src="images/avatar.jpg" alt="avatar">
+                  </div>
+                  <div class="user-pane__content">
+                    <div class="user-pane__title">
+                      Your user-paneor Name
+                    </div>
+                    <div class="board-video__name">Rock</div>
+                  </div>
+                </div>
+                <img class="board-video__play" src="images/play.svg" alt="">
+                <a class="board-video__btn btn" href="#" @click="active=4; genreName='rock'">Choose</a>
+              </div>
+            </div>
+            <div class="board__item" v-if="active==0">
+                <div class="board-video">
+                  <div class="user-pane">
+                    <div class="user-pane__avatar">
+                      <img src="images/avatar.jpg" alt="avatar">
+                    </div>
+                    <div class="user-pane__content">
+                      <div class="user-pane__title">
+                        Your user-paneor Name
+                      </div>
+                      <div class="board-video__name">Song Name</div>
+                    </div>
+                  </div>
+                  <img class="board-video__play" src="images/play.svg" alt="">
+<!--                  <a class="board-video__btn btn btn-grey" href="#">edit</a>-->
+                </div>
+              </div>
+      </div>
+    </section>
+    <section class="remix-intro board" v-if="false">
       <div class="remix-intro__body" style="background-image: url('images/remix-intro.jpg')">
         <div class="remix-intro__content">
           <div class="user-pane user-pane--big">
@@ -28,8 +142,8 @@
         <div class="remix-page__inner">
 
           <!-- Remix -->
-          <Player genre-name="edm"></Player><br>
-          <Player genre-name="indie"></Player>
+          <Player :genre-name="genreName"></Player><br>
+<!--          <Player genre-name="indie"></Player>-->
 
         </div>
       </div>
@@ -72,7 +186,7 @@
                 </svg>
               </a>
             </div>
-            <a class="footer__to-home" href="#">
+            <a class="footer__to-home" href="#"  @click="active=0">
               <svg
                       width="24"
                       height="24"
@@ -115,6 +229,13 @@
 import Player from "../components/Player";
 export default {
   name: 'Music',
-  components: {Player}
+  genreName: '',
+  components: {Player},
+
+  data() {
+    return {
+      active: 0,
+    }
+  },
 }
 </script>
