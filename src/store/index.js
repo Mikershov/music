@@ -45,7 +45,7 @@ export default new Vuex.Store({
           },
           mainline: {
             icon: 'main',
-            file: '1.mp3'
+            file: '2.mp3'
           },
           voice: {
             icon: '4',
