@@ -155,6 +155,10 @@ export default {
   },
 
   mounted() {
+
+    var vid = document.getElementById('mainLine_' + this.genreName);
+    vid.volume = 0.45;
+
     this.auCon = new AudioContext;
 
     //основная линия
