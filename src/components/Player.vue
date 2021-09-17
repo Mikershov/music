@@ -64,7 +64,7 @@
             <input class="volume" type="range" name="volume"/>
           </div>
 
-          <audio v-for="(item, index) in genre.sounds" :key="sound.id+'_'+index" :id="'line_'+sound.id+'_'+item.icon" :src="`samples-mp3/${genreName}/${index}/${item.file}`"></audio>
+          <audio v-for="(item, index) in genre.sounds" :key="sound.id+'_'+index" :id="'line_'+sound.id+'_'+item.icon+'_'+genreName" :src="`samples-mp3/${genreName}/${index}/${item.file}`"></audio>
 
           <div class="remix__canvas">
             <div v-if="sound.data" class="sub-line-vis" v-bind:style="{width:getLineWidth(sound)+'%', left:getLineLeft(sound)+'%'}"></div>
@@ -220,7 +220,7 @@ export default {
 
     lineGenerate(sound) {
       //источник
-      sound.source = document.getElementById('line_'+sound.id+'_'+sound.data.icon);
+      sound.source = document.getElementById('line_'+sound.id+'_'+sound.data.icon+'_'+this.genreName);
       //связывание источника и контекста и вывод в звук
       sound.track = this.auCon.createMediaElementSource(sound.source);
       sound.track.connect(this.auCon.destination);
