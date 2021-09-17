@@ -16,11 +16,11 @@ export default new Vuex.Store({
         time: 15000,
         sounds: {
           fx: {
-            icon: '3.png',
+            icon: '3',
             file: '1.mp3'
           },
           melody:{
-            icon: '4.png',
+            icon: '4',
             file: '3.mp3'
           },
           rhythm: {
@@ -28,7 +28,7 @@ export default new Vuex.Store({
             file: '1.mp3'
           },
           synthesizer: {
-            icon: '5.png',
+            icon: '6',
             file: '5.mp3'
           }
         },

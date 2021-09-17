@@ -2,13 +2,16 @@
   <div class="remix">
     {{genre.sounds}}
     <hr>
+    {{sounds}}
+    <hr>
+    <!--<hr>
     1) тег - источник файла<br>
     2) подключение источника к контексту звука<br>
     3) связывание громкости и контекста<br>
     4) связывание слайдера звка с громкостью через событие<br>
     5) логика плей/пауза/стоп <br>
     6) дополнительная логика (переключение в конце, сброс остальных треков при достижении конца основного) <br>
-    7) визуализация
+    7) визуализация-->
     <!--<hr>
     {{mainLine}}
     <hr>
@@ -22,11 +25,7 @@
         <div class="remix__author">DJ's name</div>
         <div class="remix__name">Song Name</div>
 
-        <div class="remix__volume volume">
-          <div class="volume__bar" style="width: 100%"></div>
-          <div class="volume__track"></div>
-          <div class="volume__thumb" style="left: 100%"></div>
-        </div>
+        <input class="volume" type="range" name="volume"/>
 
         <button @click="mainLinePlay" class="btn-play">
           <i v-if="!mainLine.playing" class="fas fa-play"></i>
@@ -35,7 +34,7 @@
       </div>
 
       <div class="remix__canvas">
-        <div class="remix__divider divider" v-bind:style="{left: mainLine.slider+'%'}">
+        <div class="remix__divider divider" v-bind:class="{'slow-back':!mainLine.playing}" v-bind:style="{left: mainLine.slider+'%'}">
           <img class="divider__before" src="images/arrow-bottom.svg" alt=""/>
           <div class="divider__line"></div>
           <img class="divider__after" src="images/arrow-top.svg" alt=""/>
@@ -62,13 +61,33 @@
               </button>
             </div>
 
-            <input class="volume volume-grey" type="range" name="volume"/>
-
+            <input class="volume" type="range" name="volume"/>
           </div>
+
+          <audio v-for="(item, index) in genre.sounds" :key="sound.id+'_'+index" :id="'line_'+sound.id+'_'+item.icon" :src="`samples-mp3/${genreName}/${index}/${item.file}`"></audio>
 
           <div class="remix-item__canvas">
             <div class="remix-item__divider"></div>
             <div class="remix-item__analyser"><img src="images/analyser-2.png" alt="analyser" /></div>
+          </div>
+
+          <div v-if="sounds.length !==0" class="remix-tools__block">
+            <ul class="remix-tools__items">
+              <li v-for="soundToAdd in addSoundList" :key="soundToAdd.icon" class="remix-tools__item">
+                <a @click.prevent="addLine(sound, soundToAdd)" class="remix-tools__link" v-bind:class="{'sound-activ':checkActiveSound(sound, soundToAdd)}" href="#">
+                  <span :class="'remix-tools__icon remix-tools__icon--'+soundToAdd.icon"></span>
+                </a>
+              </li>
+            </ul>
+
+            <div v-if="sound.data" class="remix-tools__actions">
+              <button @click="linePlay(sound)" class="remix-tools__record">
+                <img src="images/record.svg" alt="record" />
+              </button>
+              <button v-if="false" class="remix-tools__pause">
+                <img src="images/pause.svg" alt="pause" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -77,55 +96,10 @@
 
     <div class="remix__footer">
       <div class="remix-tools">
-        <div v-if="sounds.length !==0" class="remix-tools__block">
-
-          <ul class="remix-tools__items">
-            <li class="remix-tools__item">
-              <a class="remix-tools__link" href="#"><span class="remix-tools__icon remix-tools__icon--1"></span></a>
-            </li>
-
-            <li class="remix-tools__item">
-              <a class="remix-tools__link" href="#"><span class="remix-tools__icon remix-tools__icon--2"></span></a>
-            </li>
-
-            <li class="remix-tools__item">
-              <a class="remix-tools__link" href="#"><span class="remix-tools__icon remix-tools__icon--3"></span></a>
-            </li>
-
-            <li class="remix-tools__item">
-              <a class="remix-tools__link" href="#"><span class="remix-tools__icon remix-tools__icon--4"></span></a>
-            </li>
-
-            <li class="remix-tools__item">
-              <a class="remix-tools__link" href="#"><span class="remix-tools__icon remix-tools__icon--5"></span></a>
-            </li>
-
-            <li class="remix-tools__item">
-              <a class="remix-tools__link" href="#"><span class="remix-tools__icon remix-tools__icon--6"></span></a>
-            </li>
-          </ul>
-
-          <div class="remix-tools__actions">
-            <button class="remix-tools__record">
-              <img src="images/record.svg" alt="record" />
-            </button>
-            <button class="remix-tools__pause">
-              <img src="images/pause.svg" alt="pause" />
-            </button>
-          </div>
-        </div>
-
         <button class="remix-tools__button" @click="addSound()">
           <img src="images/plus.svg" alt="add remix" />
         </button>
       </div>
-
-      <!-- <div class="remix__canvas">
-        <div class="remix__divider"></div>
-        <div class="remix__analyser">
-          <img src="images/analyser-3.png" alt="analyser" />
-        </div>
-      </div> -->
     </div>
   </div>
 </template>
@@ -142,7 +116,17 @@ export default {
   },
 
   computed: {
+    addSoundList() {
+      let sounds = [];
 
+      Object.keys(this.genre.sounds).forEach(item => {
+        if(this.genre.sounds[item].icon !== 'main') {
+          sounds.push(Object.assign({soundName:item},this.genre.sounds[item]));
+        }
+      });
+
+      return sounds;
+    }
   },
 
   data() {
@@ -187,6 +171,7 @@ export default {
 
     //анализатор
     this.mainLine.canvas = document.getElementById('mainLineVis').getContext("2d");
+    //this.mainLine.canvas.imageSmoothingEnabled = false;
     this.mainLine.analyser = this.auCon.createAnalyser();
     this.mainLine.track.connect(this.mainLine.analyser);
     this.mainLine.analyser.connect(this.auCon.destination);
@@ -206,12 +191,60 @@ export default {
   methods: {
     addSound() {
       this.soundCounter++;
-      this.sounds.push({id:this.soundCounter})
+      this.sounds.push({id:this.soundCounter, data:null})
+    },
+
+    addLine(sound, soundToAdd) {
+      if(sound?.data?.icon !== soundToAdd.icon) {
+        sound.data = soundToAdd;
+        setTimeout(() => {this.lineGenerate(sound)}, 100);
+      }
+    },
+
+    checkActiveSound(sound, soundToAdd) {
+      return sound?.data?.icon===soundToAdd.icon
+    },
+
+    lineGenerate(sound) {
+      sound.playing = false;
+      sound.slider = 0;
+      sound.timeStart = 5;
+      sound.timeEnd = 10;
+      //источник
+      sound.source = document.getElementById('line_'+sound.id+'_'+sound.data.icon);
+      console.log('line_'+sound.id+'_'+sound.data.icon)
+      //связывание источника и контекста и вывод в звук
+      sound.track = this.auCon.createMediaElementSource(sound.source);
+      sound.track.connect(this.auCon.destination);
+      //связывание громкости и трека
+      sound.gainNode = this.auCon.createGain();
+      sound.track.connect(sound.gainNode).connect(this.auCon.destination);
+      //автопереключение в конце трека
+      sound.source.addEventListener('ended', () => {
+        sound.playing = false;
+        sound.source.currentTime = 0;
+      }, false);
+    },
+
+    linePlay(sound) {
+      // check if context is in suspended state (autoplay policy)
+      if (this.auCon.state === 'suspended') {
+        this.auCon.resume();
+      }
+
+      // play or pause track depending on state
+      if (sound.playing === false) {
+        sound.source.play();
+        sound.playing = true;
+
+      } else if (this.mainLine.playing === true) {
+        sound.source.pause();
+        sound.source.currentTime = 0;
+        sound.playing = false;
+      }
     },
 
     mainLinePlay() {
-      console.log('PLAY', this.mainLine);
-
       // check if context is in suspended state (autoplay policy)
       if (this.auCon.state === 'suspended') {
         this.auCon.resume();
@@ -234,11 +267,6 @@ export default {
 
       //слайдер главного трека
       this.mainLine.slider = this.mainLine.source.currentTime/this.mainLine.source.duration*100;
-
-      //визуализация
-      //arrayMain = new Uint8Array(analyserMain.frequencyBinCount);
-      //analyserMain.getByteFrequencyData(arrayMain);
-      //mainVis.width = (arrayMain[40])+"px";
 
       //таймер
       this.mainLine.curTime = this.mainLine.source.currentTime.toFixed(2);
@@ -268,8 +296,8 @@ export default {
       for (let i = 0; i < this.mainLine.bufferLength; i++) {
         this.mainLine.barHeight = this.mainLine.dataArray[i];
 
-        let r = this.mainLine.barHeight + (25 * (i/this.mainLine.bufferLength));
-        let g = 250 * (i/this.mainLine.bufferLength);
+        let r = 255;
+        let g = 255;
         let b = 255;
 
         this.mainLine.canvas.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
@@ -277,7 +305,7 @@ export default {
 
         this.mainLine.x += this.mainLine.barWidth + 1;
       }
-    }
+    },
   }
 
 }
@@ -314,4 +342,114 @@ export default {
   .remix__divider {
     transform: translate(-50%, -50%);
   }
+
+  .slow-back {
+    transition: all 0.5s;
+  }
+
+  .remix-tools__block {
+    margin-top: 10px;
+  }
+
+  .sound-activ {
+    border: 1px solid #fff;
+  }
+</style>
+
+<style>
+  input[type=range] {
+    width: 100%;
+    margin: 5px 0;
+    background-color: transparent;
+    -webkit-appearance: none;
+  }
+  input[type=range]:focus {
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-runnable-track {
+    background: rgba(0, 0, 0, 1);
+    border: 0;
+    border-radius: 1px;
+    width: 100%;
+    height: 2px;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    margin-top: -5px;
+    width: 12px;
+    height: 12px;
+    background: #ffffff;
+    border: 0px solid rgba(0, 0, 0, 0);
+    border: 0;
+    border-radius: 12px;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+  input[type=range]:focus::-webkit-slider-runnable-track {
+    background: #0d0d0d;
+  }
+  input[type=range]::-moz-range-track {
+    background: rgba(0, 0, 0, 0.9);
+    border: 0;
+    border-radius: 1px;
+    width: 100%;
+    height: 2px;
+    cursor: pointer;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: #ffffff;
+    border: 0px solid rgba(0, 0, 0, 0);
+    border: 0;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+  input[type=range]::-ms-track {
+    background: transparent;
+    border-color: transparent;
+    border-width: 5px 0;
+    color: transparent;
+    width: 100%;
+    height: 2px;
+    cursor: pointer;
+  }
+  input[type=range]::-ms-fill-lower {
+    background: #000000;
+    border: 0;
+    border-radius: 2px;
+  }
+  input[type=range]::-ms-fill-upper {
+    background: rgba(0, 0, 0, 0.9);
+    border: 0;
+    border-radius: 2px;
+  }
+  input[type=range]::-ms-thumb {
+    width: 12px;
+    height: 12px;
+    background: #ffffff;
+    border: 0px solid rgba(0, 0, 0, 0);
+    border: 0;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 0px;
+    /*Needed to keep the Edge thumb centred*/
+  }
+  input[type=range]:focus::-ms-fill-lower {
+    background: rgba(0, 0, 0, 0.9);
+  }
+  input[type=range]:focus::-ms-fill-upper {
+    background: #0d0d0d;
+  }
+  /*TODO: Use one of the selectors from https://stackoverflow.com/a/20541859/7077589 and figure out
+  how to remove the virtical space around the range input in IE*/
+  @supports (-ms-ime-align:auto) {
+    /* Pre-Chromium Edge only styles, selector taken from hhttps://stackoverflow.com/a/32202953/7077589 */
+    input[type=range] {
+      margin: 0;
+      /*Edge starts the margin from the thumb, not the track as other browsers do*/
+    }
+  }
+
+
 </style>
