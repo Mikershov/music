@@ -50,11 +50,11 @@ export default new Vuex.Store({
           voice: {
             icon: '4',
             file: '5.mp3'
-          },
-          winds: {
-            icon: '2',
-            file: '2.mp3'
           }
+          // winds: {
+          //   icon: '2',
+          //   file: '2.mp3'
+          // }
         },
       },
       instrumental: {
