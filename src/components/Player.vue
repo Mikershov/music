@@ -157,7 +157,7 @@ export default {
   mounted() {
 
     var vid = document.getElementById('mainLine_' + this.genreName);
-    vid.volume = 0.45;
+    vid.volume = 0.2;
 
     this.auCon = new AudioContext;
 
