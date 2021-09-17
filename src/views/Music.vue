@@ -54,11 +54,11 @@
                     <div class="user-pane__title">
                       Your user-paneor Name
                     </div>
-                    <div class="board-video__name">Indie</div>
+                    <div class="board-video__name">Instrumental</div>
                   </div>
                 </div>
                 <img class="board-video__play" src="images/play.svg" alt="">
-                <a class="board-video__btn btn" href="#" @click="active=2; genreName='indie'">Choose</a>
+                <a class="board-video__btn btn" href="#" @click="active=2; genreName='instrumental'">Choose</a>
               </div>
             </div>
             <div class="board__item" v-if="active==0">
@@ -71,11 +71,11 @@
                     <div class="user-pane__title">
                       Your user-paneor Name
                     </div>
-                    <div class="board-video__name">classic</div>
+                    <div class="board-video__name">Pop</div>
                   </div>
                 </div>
                 <img class="board-video__play" src="images/play.svg" alt="">
-                <a class="board-video__btn btn" href="#" @click="active=3; genreName='classic'">Choose</a>
+                <a class="board-video__btn btn" href="#" @click="active=3; genreName='pop'">Choose</a>
               </div>
             </div>
             <div class="board__item" v-if="active==0">
@@ -137,7 +137,7 @@
     </section>
 
     <!-- Main -->
-    <main class="remix-page" role="main">
+    <main class="remix-page" role="main" v-if="active>0">
       <div class="container">
         <div class="remix-page__inner">
 
@@ -150,7 +150,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="footer"  v-if="active>0">
       <div class="container">
         <div class="footer__holder">
           <div class="footer__controls">

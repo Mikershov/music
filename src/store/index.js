@@ -11,16 +11,20 @@ export default new Vuex.Store({
         time: 15000,
         sounds: {
           fx: {
-            icon: '3',
+            icon: '4',
             file: '1.mp3'
           },
           melody:{
             icon: '4',
             file: '3.mp3'
           },
-          rhythm: {
+          mainline: {
             icon: 'main',
             file: '1.mp3'
+          },
+          rhythm: {
+            icon: '3',
+            file: '5.mp3'
           },
           synthesizer: {
             icon: '6',
@@ -28,44 +32,52 @@ export default new Vuex.Store({
           }
         },
       },
-      indie: {
+      pop: {
         time: 15000,
         sounds: {
-          bass: {
-            icon: '2',
-            file: '1.mp3'
-          },
-          guitar:{
-            icon: '5',
-            file: '1.mp3'
-          },
           rhythm: {
+            icon: '3',
+            file: '1.mp3'
+          },
+          synthesizer:{
+            icon: '6',
+            file: '1.mp3'
+          },
+          mainline: {
             icon: 'main',
             file: '1.mp3'
           },
           voice: {
             icon: '4',
             file: '5.mp3'
+          },
+          winds: {
+            icon: '2',
+            file: '5.mp3'
           }
         },
       },
-      classic: {
+      instrumental: {
         time: 15000,
         sounds: {
-          contrabass: {
-            icon: '2',
-            file: '1.mp3'
-          },
-          string:{
+          guitar: {
             icon: '5',
             file: '1.mp3'
           },
-          piano: {
+          piano:{
+            icon: '6',
+            file: '1.mp3'
+          },
+          strings:{
+            icon: '4',
+            file: '1.mp3'
+          },
+          mainline: {
             icon: 'main',
             file: '1.mp3'
           },
-          violin: {
-            icon: '4',
+          pizzicato: {
+            icon: '3',
             file: '5.mp3'
           }
         },
@@ -74,15 +86,19 @@ export default new Vuex.Store({
         time: 15000,
         sounds: {
           bass: {
-            icon: '2',
+            icon: '3',
             file: '1.mp3'
           },
-          drums:{
+          mainline:{
             icon: 'main',
             file: '1.mp3'
           },
           guitar: {
-            icon: '1',
+            icon: '5',
+            file: '1.mp3'
+          },
+          drums: {
+            icon: '2',
             file: '1.mp3'
           },
           voice: {
