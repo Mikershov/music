@@ -28,7 +28,8 @@
         <div class="remix-page__inner">
 
           <!-- Remix -->
-          <Player genre-name="edm"></Player>
+          <Player genre-name="edm"></Player><br>
+          <Player genre-name="indie"></Player>
 
         </div>
       </div>

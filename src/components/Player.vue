@@ -1,9 +1,9 @@
 <template>
   <div class="remix">
-    {{genre.sounds}}
+   <!--{{genre.sounds}}
     <hr>
     {{sounds}}
-    <hr>
+    <hr>-->
     <!--<hr>
     1) тег - источник файла<br>
     2) подключение источника к контексту звука<br>
@@ -18,7 +18,7 @@
     {{mainLine.curTime}} / {{mainLine.time}}
     <hr>-->
 
-    <audio id="mainLine" :src="`samples-mp3/${genreName}/${mainLine.name}/${mainLine.file}`"></audio>
+    <audio :id="'mainLine_'+genreName" :src="`samples-mp3/${genreName}/${mainLine.name}/${mainLine.file}`"></audio>
 
     <div  class="remix__header">
       <div class="remix__block">
@@ -41,7 +41,7 @@
         </div>
 
         <div class="remix__analyser">
-          <canvas id="mainLineVis" style="width: 100%; height:50px"></canvas>
+          <canvas :id="'mainLineVis_'+genreName" style="width: 100%; height:50px"></canvas>
         </div>
       </div>
     </div>
@@ -56,7 +56,7 @@
                 <img src="images/volume-off.svg" alt="" />
               </button>
 
-              <button class="remix-item__action" type="button">
+              <button @click="deleteSound(sound)" class="remix-item__action" type="button">
                 <img src="images/trash.svg" alt="" />
               </button>
             </div>
@@ -66,9 +66,12 @@
 
           <audio v-for="(item, index) in genre.sounds" :key="sound.id+'_'+index" :id="'line_'+sound.id+'_'+item.icon" :src="`samples-mp3/${genreName}/${index}/${item.file}`"></audio>
 
-          <div class="remix-item__canvas">
-            <div class="remix-item__divider"></div>
-            <div class="remix-item__analyser"><img src="images/analyser-2.png" alt="analyser" /></div>
+          <div class="remix__canvas">
+            <div v-if="sound.data" class="sub-line-vis" v-bind:style="{width:getLineWidth(sound)+'%', left:getLineLeft(sound)+'%'}"></div>
+
+            <div v-if="sound.data" class="remix__divider divider divider-simple"  v-bind:class="{'slow-back':!mainLine.playing}" v-bind:style="{left: mainLine.slider+'%'}">
+              <div class="divider__line"></div>
+            </div>
           </div>
 
           <div v-if="sounds.length !==0" class="remix-tools__block">
@@ -80,11 +83,11 @@
               </li>
             </ul>
 
-            <div v-if="sound.data" class="remix-tools__actions">
-              <button @click="linePlay(sound)" class="remix-tools__record">
+            <div v-show="sound.data && mainLine.playing" class="remix-tools__actions">
+              <button v-show="!sound.record" @click="lineRecord(sound)" class="remix-tools__record">
                 <img src="images/record.svg" alt="record" />
               </button>
-              <button v-if="false" class="remix-tools__pause">
+              <button v-show="sound.record" @click="lineStopRecord(sound)" class="remix-tools__pause">
                 <img src="images/pause.svg" alt="pause" />
               </button>
             </div>
@@ -156,7 +159,7 @@ export default {
 
     //основная линия
     //источник
-    this.mainLine.source = document.getElementById('mainLine');
+    this.mainLine.source = document.getElementById('mainLine_'+this.genreName);
     //связывание источника и контекста и вывод в звук
     this.mainLine.track = this.auCon.createMediaElementSource(this.mainLine.source);
     this.mainLine.track.connect(this.auCon.destination);
@@ -170,7 +173,7 @@ export default {
     }, false);
 
     //анализатор
-    this.mainLine.canvas = document.getElementById('mainLineVis').getContext("2d");
+    this.mainLine.canvas = document.getElementById('mainLineVis_'+this.genreName).getContext("2d");
     //this.mainLine.canvas.imageSmoothingEnabled = false;
     this.mainLine.analyser = this.auCon.createAnalyser();
     this.mainLine.track.connect(this.mainLine.analyser);
@@ -178,8 +181,8 @@ export default {
     this.mainLine.analyser.fftSize = 1024;
     this.mainLine.bufferLength = this.mainLine.analyser.frequencyBinCount;
     this.mainLine.dataArray = new Uint8Array(this.mainLine.bufferLength);
-    this.mainLine.canvasWidth = document.getElementById('mainLineVis').width;
-    this.mainLine.canvasHeight = document.getElementById('mainLineVis').height;
+    this.mainLine.canvasWidth = document.getElementById('mainLineVis_'+this.genreName).width;
+    this.mainLine.canvasHeight = document.getElementById('mainLineVis_'+this.genreName).height;
     this.mainLine.barWidth = (this.mainLine.canvasWidth / this.mainLine.bufferLength) * 2.5;
     this.mainLine.barHeight = '';
     this.mainLine.x = 0;
@@ -194,8 +197,18 @@ export default {
       this.sounds.push({id:this.soundCounter, data:null})
     },
 
+    deleteSound(sound) {
+      let index = this.sounds.findIndex(item => item.id === sound.id);
+      this.sounds.splice(index, 1);
+    },
+
     addLine(sound, soundToAdd) {
       if(sound?.data?.icon !== soundToAdd.icon) {
+        sound.playing = false;
+        sound.record = false;
+        sound.slider = 1;
+        sound.timeStart = null;
+        sound.timeEnd = null;
         sound.data = soundToAdd;
         setTimeout(() => {this.lineGenerate(sound)}, 100);
       }
@@ -206,13 +219,8 @@ export default {
     },
 
     lineGenerate(sound) {
-      sound.playing = false;
-      sound.slider = 0;
-      sound.timeStart = 5;
-      sound.timeEnd = 10;
       //источник
       sound.source = document.getElementById('line_'+sound.id+'_'+sound.data.icon);
-      console.log('line_'+sound.id+'_'+sound.data.icon)
       //связывание источника и контекста и вывод в звук
       sound.track = this.auCon.createMediaElementSource(sound.source);
       sound.track.connect(this.auCon.destination);
@@ -244,6 +252,42 @@ export default {
       }
     },
 
+    lineRecord(sound) {
+      sound.record = true;
+      sound.timeStart = this.mainLine.source.currentTime;
+
+      // check if context is in suspended state (autoplay policy)
+      if (this.auCon.state === 'suspended') {
+        this.auCon.resume();
+      }
+
+      // play or pause track depending on state
+      if (sound.playing === false) {
+        sound.source.play();
+        sound.playing = true;
+
+      } else if (this.mainLine.playing === true) {
+        sound.source.pause();
+        sound.source.currentTime = 0;
+        sound.playing = false;
+      }
+    },
+
+    lineStopRecord(sound) {
+        sound.record = false;
+        sound.source.pause();
+        sound.source.currentTime = 0;
+        sound.playing = false;
+    },
+
+    getLineWidth(sound) {
+      return (sound?.timeEnd-sound?.timeStart)/this.mainLine.source.duration*100;
+    },
+
+    getLineLeft(sound) {
+      return sound?.timeStart/this.mainLine.source.duration*100;
+    },
+
     mainLinePlay() {
       // check if context is in suspended state (autoplay policy)
       if (this.auCon.state === 'suspended') {
@@ -272,16 +316,27 @@ export default {
       this.mainLine.curTime = this.mainLine.source.currentTime.toFixed(2);
       this.mainLine.time = this.mainLine.source.duration.toFixed(2);
 
-     /* //подключение второстепенных дорожек от времени основной
-      if(audioElement.currentTime >= guitarTimeStart && audioElement.currentTime <= guitarTimeEnd) {
-        guitar.play();
-        playBtnGuitar.dataset.playing = 'true';
-        playBtnGuitar.innerText = 'Stop';
-      } else {
-        guitar.pause();
-        playBtnGuitar.dataset.playing = 'false';
-        playBtnGuitar.innerText = 'Start';
-      }*/
+      //подключение второстепенных дорожек от времени основной
+      this.sounds.forEach(item => {
+        if(item.source && item.timeStart !== item.timeEnd && this.mainLine.playing && item.record===false) {
+          if(this.mainLine.source.currentTime >= item.timeStart && this.mainLine.source.currentTime <= item.timeEnd) {
+            if(!item.playing) {
+              this.linePlay(item);
+            }
+          } else {
+            if(item.playing) {
+              this.linePlay(item);
+            }
+          }
+        }
+      });
+
+     //запись линий
+      this.sounds.forEach(item => {
+        if(item.record) {
+          item.timeEnd = this.mainLine.source.currentTime;
+        }
+      });
 
       this.mainLineVis()
     },
@@ -306,6 +361,23 @@ export default {
         this.mainLine.x += this.mainLine.barWidth + 1;
       }
     },
+  },
+
+  watch: {
+    'mainLine.playing'() {
+      if(!this.mainLine.playing) {
+        this.sounds.forEach(line => {
+          if(line.source) {
+            line.source.pause();
+            line.source.currentTime = 0;
+            line.playing = false;
+            if(line.record) {
+              this.lineStopRecord(line)
+            }
+          }
+        });
+      }
+    }
   }
 
 }
@@ -353,6 +425,42 @@ export default {
 
   .sound-activ {
     border: 1px solid #fff;
+  }
+
+  .remix-item__canvas {
+    position: relative;
+  }
+
+  .sub-line-vis {
+    position: absolute;
+    top: 21px;
+    background-color: rgba(255, 255, 255, .5);
+    height: 20px;
+  }
+
+  .remix__header {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    -moz-column-gap: 20px;
+    column-gap: 20px;
+    margin: 0 -20px 20px;
+    padding: 19px 19px 17px;
+    border-radius: 30px;
+  }
+
+  .remix__canvas {
+    margin-bottom: 5px;
+  }
+
+  .remix-item {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    -moz-column-gap: 20px;
+    column-gap: 20px;
+    margin: 0 -20px 20px;
+    padding: 19px 19px 17px;
+    border-radius: 30px;
+    background-color: #ffb9b5;
   }
 </style>
 

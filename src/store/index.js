@@ -7,12 +7,6 @@ export default new Vuex.Store({
   state: {
     genres: {
       edm: {
-        en: 'Electronic Dance Music',
-        de: 'Elektronische Tanzmusik',
-        fr: 'Musique de danse électronique',
-        it: 'Musica dance elettronica',
-        ru: 'Электронная танцевальная музыка',
-        es: 'Música electrónica y de baile',
         time: 15000,
         sounds: {
           fx: {
@@ -29,6 +23,28 @@ export default new Vuex.Store({
           },
           synthesizer: {
             icon: '6',
+            file: '5.mp3'
+          }
+        },
+      },
+
+      indie: {
+        time: 15000,
+        sounds: {
+          bass: {
+            icon: '2',
+            file: '1.mp3'
+          },
+          guitar:{
+            icon: '5',
+            file: '1.mp3'
+          },
+          rhythm: {
+            icon: 'main',
+            file: '1.mp3'
+          },
+          voice: {
+            icon: '4',
             file: '5.mp3'
           }
         },
