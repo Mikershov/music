@@ -1,0 +1,2 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["about"],{f820:function(e,t,n){"use strict";n.r(t);var a=function(){var e=this,t=e.$createElement,n=e._self._c||t;return n("div",{staticClass:"about"},[n("Player",{attrs:{"genre-name":"pop"}})],1)},c=[],s=n("cccf"),l={components:{Player:s["a"]}},o=l,r=n("2877"),u=Object(r["a"])(o,a,c,!1,null,null,null);t["default"]=u.exports}}]);
+//# sourceMappingURL=about.4a0cd566.js.map

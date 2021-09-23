@@ -40,7 +40,7 @@ export default new Vuex.Store({
             icon: '3',
             file: '1.mp3'
           },
-          synthesizer:{
+          synthesizer: {
             icon: '6',
             file: '1.mp3'
           },

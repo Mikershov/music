@@ -46,14 +46,17 @@
                 <img src="images/trash.svg" alt="" />
               </button>
             </div>
-
-            <input class="volume" :id="'volume_'+sound.id+'_'+genreName" type="range" name="volume" min="0" max="1"  step="0.01">
+            <input :disabled="mainLine.playing" class="volume" :class="{'volume-block':mainLine.playing}" :id="'volume_'+sound.id+'_'+genreName" type="range" name="volume" min="0" max="1"  step="0.01">
           </div>
 
           <audio v-for="(item, index) in genre.sounds" :key="sound.id+'_'+index" :id="'line_'+sound.id+'_'+item.icon+'_'+genreName" :src="`samples-mp3/${genreName}/${index}/${item.file}`"></audio>
 
           <div class="remix__canvas">
-            <div v-if="sound.data" class="sub-line-vis" v-bind:style="{width:getLineWidth(sound)+'%', left:getLineLeft(sound)+'%'}"></div>
+            <button @click="clearSublineTimes(sound)" class="remix-tools__record">
+              <i  class="fas fa-trash"></i>
+            </button>
+
+            <div v-for="time in sound.playTimes" :key="time.start" class="sub-line-vis" v-bind:style="{width:getLineWidth(time)+'%', left:getLineLeft(time)+'%'}"></div>
 
             <div v-if="sound.data" class="remix__divider divider divider-simple"  v-bind:class="{'slow-back':!mainLine.playing}" v-bind:style="{left: mainLine.slider+'%'}">
               <div class="divider__line"></div>
@@ -62,14 +65,14 @@
 
           <div v-if="sounds.length !==0" class="remix-tools__block">
             <ul class="remix-tools__items">
-              <li v-for="soundToAdd in addSoundList" :key="soundToAdd.icon" class="remix-tools__item">
+              <li v-for="soundToAdd in addSoundList" :key="soundToAdd.icon" class="remix-tools__item" :class="{'subline-block':mainLine.playing}">
                 <a @click.prevent="addLine(sound, soundToAdd)" class="remix-tools__link" v-bind:class="{'sound-activ':checkActiveSound(sound, soundToAdd)}" href="#">
                   <span :class="'remix-tools__icon remix-tools__icon--'+soundToAdd.icon"></span>
                 </a>
               </li>
             </ul>
 
-            <div >
+            <div v-if="false">
               <button @click="subLinePlay(sound)" class="remix-tools__record">
                 <i  class="fas fa-play"></i>
                 <i v-show="sound.playing" class="fas fa-stop"></i>
@@ -170,8 +173,7 @@ export default {
 
     //автопереключение в конце трека
     this.mainLine.source.addEventListener('ended', () => {
-      this.mainLine.playing = false;
-      this.mainLine.source.currentTime = 0;
+     this.mainLinePlay();
     }, false);
 
     //анализатор
@@ -219,6 +221,11 @@ export default {
         return false;
       }
 
+      //не идет ли воспроизведение
+      if(sound.playing) {
+        return false;
+      }
+
       if(sound?.data?.icon !== soundToAdd.icon) {
         sound.playing = false;
         sound.record = false;
@@ -226,6 +233,7 @@ export default {
         sound.timeStart = null;
         sound.timeEnd = null;
         sound.data = soundToAdd;
+        sound.playTimes = [];
         setTimeout(() => {this.lineGenerate(sound)}, 100);
       }
     },
@@ -246,8 +254,10 @@ export default {
       sound.volumeControl = document.getElementById('volume_'+sound.id+'_'+this.genreName);
       sound.volumeControl.value = 1;
       sound.source.volume = 1;
+      sound.volumeBack = 1;
       sound.volumeControl.addEventListener('input', (e) => {
         sound.source.volume = e.target.value;
+        sound.volumeBack = e.target.value;
       }, false);
       //автопереключение в конце трека
       sound.source.addEventListener('ended', () => {
@@ -256,58 +266,26 @@ export default {
       }, false);
     },
 
-    linePlay(sound) {
-      // check if context is in suspended state (autoplay policy)
-      if (this.auCon.state === 'suspended') {
-        this.auCon.resume();
-      }
-
-      // play or pause track depending on state
-      if (sound.playing === false) {
-        sound.source.play();
-        sound.playing = true;
-
-      } else if (this.mainLine.playing === true) {
-        sound.source.pause();
-        sound.source.currentTime = 0;
-        sound.playing = false;
-      }
-    },
-
     lineRecord(sound) {
       sound.record = true;
       sound.timeStart = this.mainLine.source.currentTime;
+      sound.source.volume = sound.volumeBack;
 
-      // check if context is in suspended state (autoplay policy)
-      if (this.auCon.state === 'suspended') {
-        this.auCon.resume();
-      }
-
-      // play or pause track depending on state
-      if (sound.playing === false) {
-        sound.source.play();
-        sound.playing = true;
-
-      } else if (this.mainLine.playing === true) {
-        sound.source.pause();
-        sound.source.currentTime = 0;
-        sound.playing = false;
-      }
+      sound.playTimes.push({start:this.mainLine.source.currentTime, end:null, status: 'wait'});
     },
 
     lineStopRecord(sound) {
-        sound.record = false;
-        sound.source.pause();
-        sound.source.currentTime = 0;
-        sound.playing = false;
+      sound.record = false;
+      sound.source.currentTime = 0;
+      sound.source.volume = 0;
     },
 
-    getLineWidth(sound) {
-      return (sound?.timeEnd-sound?.timeStart)/this.mainLine.source.duration*100;
+    getLineWidth(times) {
+      return (times.end-times.start)/this.mainLine.source.duration*100;
     },
 
-    getLineLeft(sound) {
-      return sound?.timeStart/this.mainLine.source.duration*100;
+    getLineLeft(times) {
+      return times.start/this.mainLine.source.duration*100;
     },
 
     mainLinePlay() {
@@ -316,20 +294,49 @@ export default {
         this.auCon.resume();
       }
 
-      // play or pause track depending on state
-      if (this.mainLine.playing === false) {
+      if(!this.mainLine.playing) {
         this.mainLine.source.play();
         this.mainLine.playing = true;
 
-      } else if (this.mainLine.playing === true) {
+        this.subLinesAllPlay();
+      } else {
         this.mainLine.source.pause();
         this.mainLine.source.currentTime = 0;
         this.mainLine.playing = false;
+
+        this.subLinesAllPlay(false);
       }
+    },
+
+    subLinesAllPlay(status = true) {
+      this.sounds.forEach(sound => {
+        if(sound.source) {
+          if(status) {
+            sound.source.play();
+            sound.source.volume = 0;
+            sound.playing = true;
+          } else {
+            sound.source.pause();
+            sound.source.currentTime = 0;
+            sound.source.volume = sound.volumeBack;
+            sound.playing = false;
+            sound.record = false;
+            
+            sound.playTimes.forEach(time => {
+              time.status = 'wait';
+            });
+          }
+        }
+      });
     },
 
     subLinePlay() {
 
+    },
+
+    clearSublineTimes(sound) {
+      console.log('clear')
+      sound.playTimes = [];
     },
 
     loop() {
@@ -343,24 +350,37 @@ export default {
       this.mainLine.time = this.mainLine.source.duration.toFixed(2);
 
       //подключение второстепенных дорожек от времени основной
-      this.sounds.forEach(item => {
-        if(item.source && item.timeStart !== item.timeEnd && this.mainLine.playing && item.record===false) {
-          if(this.mainLine.source.currentTime >= item.timeStart && this.mainLine.source.currentTime <= item.timeEnd) {
-            if(!item.playing) {
-              this.linePlay(item);
+      this.sounds.forEach(sound => {
+        if(sound.source) {
+          sound.playTimes.forEach(time => {
+            if(time.start !== time.end && this.mainLine.playing && !sound.record) {
+              if(this.mainLine.source.currentTime >= time.start && this.mainLine.source.currentTime <= time.end) {
+                if(time.status === 'wait') {
+                  console.log('start', time)
+                  time.status = 'play';
+                  sound.source.volume = sound.volumeBack;
+                }
+
+                /*if(this.mainLine.source.currentTime > time.end && sound.source.volume !== 0) {
+                  console.log('stop')
+                  sound.source.volume = 0;
+                }*/
+
+              } else if(time.status === 'play') {
+                console.log('stop', time)
+                time.status = 'done';
+                sound.source.volume = 0;
+              }
             }
-          } else {
-            if(item.playing) {
-              this.linePlay(item);
-            }
-          }
+          });
         }
       });
 
-     //запись линий
+      //запись линий
       this.sounds.forEach(item => {
         if(item.record) {
           item.timeEnd = this.mainLine.source.currentTime;
+          item.playTimes[item.playTimes.length-1].end = this.mainLine.source.currentTime;
         }
       });
 
@@ -416,7 +436,7 @@ export default {
       this.soundCounter=  0;
     },
 
-    'mainLine.playing'() {
+    /*'mainLine.playing'() {
       if(!this.mainLine.playing) {
         this.sounds.forEach(line => {
           if(line.source) {
@@ -429,7 +449,8 @@ export default {
           }
         });
       }
-    }
+    }*/
+
   }
 
 }
@@ -513,6 +534,14 @@ export default {
     padding: 19px 19px 17px;
     border-radius: 30px;
     background-color: #ffb9b5;
+  }
+
+  .volume-block {
+    opacity: 0.3;
+  }
+
+  .subline-block {
+    opacity: 0.5;
   }
 </style>
 
