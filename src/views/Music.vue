@@ -61,16 +61,13 @@
                 <a class="board-video__btn btn" href="#" @click="active=2; genreName='instrumental'">Choose</a>
               </div>
             </div>
+
             <div class="board__item" v-if="active==0">
               <div class="board-video" style="background-image: url('images/video-1.jpg')">
                 <div class="user-pane">
-                  <div class="user-pane__avatar">
-                    <img src="images/avatar.jpg" alt="avatar">
-                  </div>
+                  <div class="user-pane__avatar"><img src="images/avatar.jpg" alt="avatar"></div>
                   <div class="user-pane__content">
-                    <div class="user-pane__title">
-                      Your user-paneor Name
-                    </div>
+                    <div class="user-pane__title">Your user-paneor Name</div>
                     <div class="board-video__name">Pop</div>
                   </div>
                 </div>
@@ -78,6 +75,7 @@
                 <a class="board-video__btn btn" href="#" @click="active=3; genreName='pop'">Choose</a>
               </div>
             </div>
+
             <div class="board__item" v-if="false">
               <div class="board-video" style="background-image: url('images/video-1.jpg')">
                 <div class="user-pane">

@@ -1,5 +1,11 @@
 <template>
   <div class="about">
-    <h1>This is an about page</h1>
+    <Player genre-name="pop"></Player>
   </div>
 </template>
+<script>
+  import Player from "../components/Player";
+  export default {
+    components: {Player}
+  }
+</script>

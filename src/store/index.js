@@ -5,7 +5,9 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+
     currentGenre: {},
+
     genres: {
       edm: {
         time: 15000,
@@ -33,7 +35,6 @@ export default new Vuex.Store({
         },
       },
       pop: {
-        time: 15000,
         sounds: {
           rhythm: {
             icon: '3',
@@ -43,18 +44,18 @@ export default new Vuex.Store({
             icon: '6',
             file: '1.mp3'
           },
-          mainline: {
+         /* mainline: {
             icon: 'main',
             file: '2.mp3'
-          },
+          },*/
           voice: {
             icon: '4',
             file: '5.mp3'
+          },
+          winds: {
+            icon: 'main',
+            file: '2.mp3'
           }
-          // winds: {
-          //   icon: '2',
-          //   file: '2.mp3'
-          // }
         },
       },
       instrumental: {

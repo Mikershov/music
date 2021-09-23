@@ -1,22 +1,8 @@
 <template>
   <div class="remix">
-   <!--{{genre.sounds}}
-    <hr>
-    {{sounds}}
-    <hr>-->
-    <!--<hr>
-    1) тег - источник файла<br>
-    2) подключение источника к контексту звука<br>
-    3) связывание громкости и контекста<br>
-    4) связывание слайдера звка с громкостью через событие<br>
-    5) логика плей/пауза/стоп <br>
-    6) дополнительная логика (переключение в конце, сброс остальных треков при достижении конца основного) <br>
-    7) визуализация-->
-    <!--<hr>
-    {{mainLine}}
-    <hr>
-    {{mainLine.curTime}} / {{mainLine.time}}
-    <hr>-->
+<pre>
+{{sounds}}
+</pre>
 
     <audio :id="'mainLine_'+genreName" :src="`samples-mp3/${genreName}/${mainLine.name}/${mainLine.file}`"></audio>
 
@@ -25,7 +11,7 @@
         <div class="remix__author">DJ's name</div>
         <div class="remix__name" style="text-transform: uppercase">{{ genreName }}</div>
 
-        <input class="volume" type="range" name="volume"/>
+        <input :id="'volume_'+genreName" class="volume" type="range" name="volume" min="0" max="1"  step="0.01">
 
         <button @click="mainLinePlay" class="btn-play">
           <i v-if="!mainLine.playing" class="fas fa-play"></i>
@@ -61,7 +47,7 @@
               </button>
             </div>
 
-            <input class="volume" type="range" name="volume"/>
+            <input class="volume" :id="'volume_'+sound.id+'_'+genreName" type="range" name="volume" min="0" max="1"  step="0.01">
           </div>
 
           <audio v-for="(item, index) in genre.sounds" :key="sound.id+'_'+index" :id="'line_'+sound.id+'_'+item.icon+'_'+genreName" :src="`samples-mp3/${genreName}/${index}/${item.file}`"></audio>
@@ -83,6 +69,13 @@
               </li>
             </ul>
 
+            <div >
+              <button @click="subLinePlay(sound)" class="remix-tools__record">
+                <i  class="fas fa-play"></i>
+                <i v-show="sound.playing" class="fas fa-stop"></i>
+              </button>
+            </div>
+
             <div v-show="sound.data && mainLine.playing" class="remix-tools__actions">
               <button v-show="!sound.record" @click="lineRecord(sound)" class="remix-tools__record">
                 <img src="images/record.svg" alt="record" />
@@ -99,7 +92,7 @@
 
     <div class="remix__footer">
       <div class="remix-tools">
-        <button class="remix-tools__button" @click="addSound()">
+        <button v-show="addBtnStatus()" class="remix-tools__button" @click="addSound()">
           <img src="images/plus.svg" alt="add remix" />
         </button>
       </div>
@@ -121,7 +114,6 @@ export default {
   computed: {
     addSoundList() {
       let sounds = [];
-
       Object.keys(this.genre.sounds).forEach(item => {
         if(this.genre.sounds[item].icon !== 'main') {
           sounds.push(Object.assign({soundName:item},this.genre.sounds[item]));
@@ -135,6 +127,7 @@ export default {
   data() {
     return {
       genre: {},
+      globalSoundsNumber: 0,
       sounds: [],
       soundCounter: 0,
       mainLine: { icon: "main", file: "", name: "", time: 0, curTime: 0, slider: 0, playing: false, source: {}, track:{}, gainNode: {}, analyser: {}, canvas: {} },
@@ -155,10 +148,6 @@ export default {
   },
 
   mounted() {
-
-    var vid = document.getElementById('mainLine_' + this.genreName);
-    vid.volume = 0.2;
-
     this.auCon = new AudioContext;
 
     //основная линия
@@ -168,8 +157,17 @@ export default {
     this.mainLine.track = this.auCon.createMediaElementSource(this.mainLine.source);
     this.mainLine.track.connect(this.auCon.destination);
     //связывание громкости и трека
-    this.mainLine.gainNode = this.auCon.createGain();
-    this.mainLine.track.connect(this.mainLine.gainNode).connect(this.auCon.destination);
+    //this.mainLine.gainNode = this.auCon.createGain();
+    //this.mainLine.track.connect(this.mainLine.gainNode).connect(this.auCon.destination);
+
+    //связывание громкости звука с ползунком
+    this.mainLine.volumeControl = document.getElementById('volume_'+this.genreName);
+    this.mainLine.volumeControl.value = 0.1;
+    this.mainLine.source.volume = 0.1;
+    this.mainLine.volumeControl.addEventListener('input', (e) => {
+      this.mainLine.source.volume = e.target.value;
+    }, false);
+
     //автопереключение в конце трека
     this.mainLine.source.addEventListener('ended', () => {
       this.mainLine.playing = false;
@@ -193,9 +191,17 @@ export default {
 
     //таймеры и визуализация
     this.loop();
+
+    //для удобства воспроизведение по спейсу
+    document.body.onkeyup = (e) => {
+      if(e.code === 'Space') {
+        this.mainLinePlay();
+      }
+    }
   },
 
   methods: {
+    //добавление пустой саб-линии в локальную структуру линий this.sounds
     addSound() {
       this.soundCounter++;
       this.sounds.push({id:this.soundCounter, data:null})
@@ -206,7 +212,13 @@ export default {
       this.sounds.splice(index, 1);
     },
 
+    //добавление данных в саблинии (выбранный звук)
     addLine(sound, soundToAdd) {
+      //не нажата ли кнопка звука уже
+      if(this.sounds.find(s => s?.data?.soundName === soundToAdd.soundName)) {
+        return false;
+      }
+
       if(sound?.data?.icon !== soundToAdd.icon) {
         sound.playing = false;
         sound.record = false;
@@ -218,19 +230,25 @@ export default {
       }
     },
 
+    //проверка выбран ли уже инструмент для саблинии
     checkActiveSound(sound, soundToAdd) {
       return sound?.data?.icon===soundToAdd.icon
     },
 
+    //подключение к заполненной саблинии исчтоника звука и логики воспроизведения
     lineGenerate(sound) {
       //источник
       sound.source = document.getElementById('line_'+sound.id+'_'+sound.data.icon+'_'+this.genreName);
       //связывание источника и контекста и вывод в звук
       sound.track = this.auCon.createMediaElementSource(sound.source);
       sound.track.connect(this.auCon.destination);
-      //связывание громкости и трека
-      sound.gainNode = this.auCon.createGain();
-      sound.track.connect(sound.gainNode).connect(this.auCon.destination);
+      //связывание громкости звука с ползунком
+      sound.volumeControl = document.getElementById('volume_'+sound.id+'_'+this.genreName);
+      sound.volumeControl.value = 1;
+      sound.source.volume = 1;
+      sound.volumeControl.addEventListener('input', (e) => {
+        sound.source.volume = e.target.value;
+      }, false);
       //автопереключение в конце трека
       sound.source.addEventListener('ended', () => {
         sound.playing = false;
@@ -310,6 +328,10 @@ export default {
       }
     },
 
+    subLinePlay() {
+
+    },
+
     loop() {
       window.requestAnimationFrame(this.loop);
 
@@ -365,10 +387,22 @@ export default {
         this.mainLine.x += this.mainLine.barWidth + 1;
       }
     },
+
+    //показывает или скрывает кнопку добавить саб-линию
+    addBtnStatus() {
+      let globalSounds = 0;
+      Object.keys(this.genre.sounds).forEach(item => {
+        if(this.genre.sounds[item].icon !== 'main') {
+          globalSounds++;
+        }
+      });
+
+      return globalSounds > this.sounds.length;
+    }
   },
 
   watch: {
-    'genreName'(){
+    'genreName'() {
       this.genre = Object.assign({}, this.$store.getters.genres[this.genreName]);
 
       //основная линия
@@ -381,6 +415,7 @@ export default {
       this.sounds = [];
       this.soundCounter=  0;
     },
+
     'mainLine.playing'() {
       if(!this.mainLine.playing) {
         this.sounds.forEach(line => {
