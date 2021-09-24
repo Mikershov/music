@@ -9,6 +9,34 @@ export default new Vuex.Store({
     currentGenre: {},
 
     genres: {
+      pop: {
+        sounds: {
+          rhythm: {
+            icon: '3',
+            file: 'rhythm.mp3'
+          },
+          rhythm2: {
+            icon: '2',
+            file: 'rhythm2.mp3'
+          },
+          synt: {
+            icon: '6',
+            file: 'synt.mp3'
+          },
+          mainline: {
+            icon: 'main',
+            file: 'main.mp3'
+          },
+          voice: {
+            icon: '4',
+            file: 'voice.mp3'
+          },
+          /* winds: {
+             icon: 'main',
+             file: '2.mp3'
+           }*/
+        },
+      },
       edm: {
         time: 15000,
         sounds: {
@@ -34,7 +62,7 @@ export default new Vuex.Store({
           }
         },
       },
-      pop: {
+      popOld: {
         sounds: {
           rhythm: {
             icon: '3',

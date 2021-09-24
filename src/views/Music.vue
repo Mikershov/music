@@ -25,7 +25,7 @@
           <div class="board-video" style="background-image: url('images/video-1.jpg')">
             <div class="user-pane">
               <div class="user-pane__avatar">
-                <img src="images/avatar.jpg" alt="avatar">
+                <img src="images/avatar.png" alt="avatar">
               </div>
               <div class="user-pane__content">
                 <div class="user-pane__title">
@@ -43,7 +43,7 @@
           <div class="board-video" style="background-image: url('images/video-2.jpg')">
             <div class="user-pane">
               <div class="user-pane__avatar">
-                <img src="images/avatar.jpg" alt="avatar">
+                <img src="images/avatar.png" alt="avatar">
               </div>
               <div class="user-pane__content">
                 <div class="user-pane__title">
@@ -60,7 +60,7 @@
         <div class="board__item" v-if="active==0">
           <div class="board-video" style="background-image: url('images/video-1.jpg')">
             <div class="user-pane">
-              <div class="user-pane__avatar"><img src="images/avatar.jpg" alt="avatar"></div>
+              <div class="user-pane__avatar"><img src="images/avatar.png" alt="avatar"></div>
               <div class="user-pane__content">
                 <div class="user-pane__title">Inspired by Amber Selection</div>
                 <div class="board-video__name">Pop</div>
@@ -75,7 +75,7 @@
           <div class="board-video" style="background-image: url('images/video-1.jpg')">
             <div class="user-pane">
               <div class="user-pane__avatar">
-                <img src="images/avatar.jpg" alt="avatar">
+                <img src="images/avatar.png" alt="avatar">
               </div>
               <div class="user-pane__content">
                 <div class="user-pane__title">
@@ -93,7 +93,7 @@
                 <div class="board-video">
                   <div class="user-pane">
                     <div class="user-pane__avatar">
-                      <img src="images/avatar.jpg" alt="avatar">
+                      <img src="images/avatar.png" alt="avatar">
                     </div>
                     <div class="user-pane__content">
                       <div class="user-pane__title">
@@ -106,6 +106,46 @@
 <!--                  <a class="board-video__btn btn btn-grey" href="#">edit</a>-->
                 </div>
               </div>
+
+        <div class="board__item" v-if="active==0">
+          <div class="board-video" style="background-image: url('images/video-1.jpg')">
+            <div class="user-pane">
+              <div class="user-pane__avatar"><img src="images/avatar.png" alt="avatar"></div>
+              <div class="user-pane__content">
+                <div class="user-pane__title">Inspired by Amber Selection</div>
+                <div class="board-video__name">Pop</div>
+              </div>
+            </div>
+            <img class="board-video__play" src="images/play.svg" alt="">
+            <a class="board-video__btn btn" href="#" @click="active=3; genreName='pop'">GET YOUR REMIX</a>
+          </div>
+        </div>
+        <div class="board__item" v-if="active==0">
+          <div class="board-video" style="background-image: url('images/video-1.jpg')">
+            <div class="user-pane">
+              <div class="user-pane__avatar"><img src="images/avatar.png" alt="avatar"></div>
+              <div class="user-pane__content">
+                <div class="user-pane__title">Inspired by Amber Selection</div>
+                <div class="board-video__name">Pop</div>
+              </div>
+            </div>
+            <img class="board-video__play" src="images/play.svg" alt="">
+            <a class="board-video__btn btn" href="#" @click="active=3; genreName='pop'">GET YOUR REMIX</a>
+          </div>
+        </div>
+        <div class="board__item" v-if="active==0">
+          <div class="board-video" style="background-image: url('images/video-1.jpg')">
+            <div class="user-pane">
+              <div class="user-pane__avatar"><img src="images/avatar.png" alt="avatar"></div>
+              <div class="user-pane__content">
+                <div class="user-pane__title">Inspired by Amber Selection</div>
+                <div class="board-video__name">Pop</div>
+              </div>
+            </div>
+            <img class="board-video__play" src="images/play.svg" alt="">
+            <a class="board-video__btn btn" href="#" @click="active=3; genreName='pop'">GET YOUR REMIX</a>
+          </div>
+        </div>
 
         <div class="board__item" v-if="active==0">
           <div class="board__img">
@@ -126,7 +166,7 @@
         <div class="remix-intro__content">
           <div class="user-pane user-pane--big">
             <div class="user-pane__avatar">
-              <img src="images/avatar.jpg" alt="avatar" />
+              <img src="images/avatar.png" alt="avatar" />
             </div>
             <div class="user-pane__content">
               <div class="user-pane__title">Your Brand Collaborator Name</div>
