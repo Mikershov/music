@@ -38,7 +38,7 @@
                 <img src="images/volume-off.svg" alt="" />
               </button>
 
-              <button @click="deleteSound(sound)" class="remix-item__action" type="button">
+              <button @click="clearSublineTimes(sound)" class="remix-item__action" type="button">
                 <img src="images/trash.svg" alt="" />
               </button>
             </div>
@@ -49,9 +49,9 @@
           <audio v-for="(item, index) in genre.sounds" :key="sound.id+'_'+index" :id="'line_'+sound.id+'_'+item.icon+'_'+genreName" :src="`samples-mp3/${genreName}/${index}/${item.file}`"></audio>
 
           <div class="remix__canvas">
-            <button :disabled="sound.record" @click="clearSublineTimes(sound)" class="remix-tools__record sub-records-clean">
+           <!-- <button :disabled="sound.record" @click="clearSublineTimes(sound)" class="remix-tools__record sub-records-clean">
               <i  class="fas fa-trash"></i>
-            </button>
+            </button>-->
 
             <div v-for="time in sound.playTimes" :key="time.start" class="sub-line-vis" v-bind:style="{width:getLineWidth(time)+'%', left:getLineLeft(time)+'%'}"></div>
 

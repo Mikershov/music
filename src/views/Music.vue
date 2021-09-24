@@ -67,7 +67,7 @@
               </div>
             </div>
             <img class="board-video__play" src="images/play.svg" alt="">
-            <a class="board-video__btn btn" href="#" @click="active=3; genreName='pop'">GET YOUR REMIX</a>
+            <a class="board-video__btn btn" href="#" @click="active=3; genreName='pop'">MAKE YOUR REMIX</a>
           </div>
         </div>
 
@@ -117,7 +117,7 @@
               </div>
             </div>
             <img class="board-video__play" src="images/play.svg" alt="">
-            <a class="board-video__btn btn" href="#" @click="active=3; genreName='pop'">GET YOUR REMIX</a>
+            <a class="board-video__btn btn" href="#" @click="active=3; genreName='pop'">MAKE YOUR REMIX</a>
           </div>
         </div>
         <div class="board__item" v-if="active==0">
@@ -130,7 +130,7 @@
               </div>
             </div>
             <img class="board-video__play" src="images/play.svg" alt="">
-            <a class="board-video__btn btn" href="#" @click="active=3; genreName='pop'">GET YOUR REMIX</a>
+            <a class="board-video__btn btn" href="#" @click="active=3; genreName='pop'">MAKE YOUR REMIX</a>
           </div>
         </div>
         <div class="board__item" v-if="active==0">
@@ -143,7 +143,7 @@
               </div>
             </div>
             <img class="board-video__play" src="images/play.svg" alt="">
-            <a class="board-video__btn btn" href="#" @click="active=3; genreName='pop'">GET YOUR REMIX</a>
+            <a class="board-video__btn btn" href="#" @click="active=3; genreName='pop'">MAKE YOUR REMIX</a>
           </div>
         </div>
 
