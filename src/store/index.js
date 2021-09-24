@@ -38,24 +38,24 @@ export default new Vuex.Store({
         sounds: {
           rhythm: {
             icon: '3',
-            file: '1.mp3'
+            file: 'rhythm.mp3'
           },
           synthesizer: {
             icon: '6',
-            file: '1.mp3'
+            file: 'synt.mp3'
           },
-         /* mainline: {
+          mainline: {
             icon: 'main',
-            file: '2.mp3'
-          },*/
+            file: 'main.mp3'
+          },
           voice: {
             icon: '4',
-            file: '5.mp3'
+            file: 'voice.mp3'
           },
-          winds: {
+         /* winds: {
             icon: 'main',
             file: '2.mp3'
-          }
+          }*/
         },
       },
       instrumental: {

@@ -3,97 +3,93 @@
     <section class="board">
       <div class="board__grid">
         <div class="board__item board__item--main">
+          <div class="text-over-img">Welcome to&nbsp;Soundtastes</div>
           <div class="board__img">
             <img src="images/board-1.jpg" alt="">
           </div>
         </div>
+
         <div class="board__item">
           <a class="board__logo" href="#">
             <img src="images/logo.svg" alt="logotype">
           </a>
         </div>
-            <div class="board__item" v-if="active==0">
-              <div class="board__img">
-                <img src="images/board-2.jpg" alt="">
-              </div>
-            </div>
-            <div class="board__item board__item--main" v-if="active==0">
-              <div class="board__welcome">
-                <div class="board__title">Welcome to&nbsp;Soundtastes</div>
-              </div>
-            </div>
-            <div class="board__item" v-if="active==0">
-              <div class="board__notice">
-                Choose your track, make&nbsp;your remix and share.
-              </div>
-            </div>
-            <div class="board__item" v-if="false">
-              <div class="board-video" style="background-image: url('images/video-1.jpg')">
-                <div class="user-pane">
-                  <div class="user-pane__avatar">
-                    <img src="images/avatar.jpg" alt="avatar">
-                  </div>
-                  <div class="user-pane__content">
-                    <div class="user-pane__title">
-                      Your user-paneor Name
-                    </div>
-                    <div class="board-video__name">EDM</div>
-                  </div>
-                </div>
-                <img class="board-video__play" src="images/play.svg" alt="">
-                <a class="board-video__btn btn" href="#" @click="active=1; genreName='edm';">Choose</a>
-              </div>
-            </div>
-            <div class="board__item" v-if="false">
-              <div class="board-video" style="background-image: url('images/video-2.jpg')">
-                <div class="user-pane">
-                  <div class="user-pane__avatar">
-                    <img src="images/avatar.jpg" alt="avatar">
-                  </div>
-                  <div class="user-pane__content">
-                    <div class="user-pane__title">
-                      Your user-paneor Name
-                    </div>
-                    <div class="board-video__name">Instrumental</div>
-                  </div>
-                </div>
-                <img class="board-video__play" src="images/play.svg" alt="">
-                <a class="board-video__btn btn" href="#" @click="active=2; genreName='instrumental'">Choose</a>
-              </div>
-            </div>
 
-            <div class="board__item" v-if="active==0">
-              <div class="board-video" style="background-image: url('images/video-1.jpg')">
-                <div class="user-pane">
-                  <div class="user-pane__avatar"><img src="images/avatar.jpg" alt="avatar"></div>
-                  <div class="user-pane__content">
-                    <div class="user-pane__title">Your user-paneor Name</div>
-                    <div class="board-video__name">Pop</div>
-                  </div>
-                </div>
-                <img class="board-video__play" src="images/play.svg" alt="">
-                <a class="board-video__btn btn" href="#" @click="active=3; genreName='pop'">Choose</a>
-              </div>
-            </div>
+        <div class="board__item" v-if="active==0">
+          <div class="board__notice">
+            Choose your track, make&nbsp;your remix and share.
+          </div>
+        </div>
 
-            <div class="board__item" v-if="false">
-              <div class="board-video" style="background-image: url('images/video-1.jpg')">
-                <div class="user-pane">
-                  <div class="user-pane__avatar">
-                    <img src="images/avatar.jpg" alt="avatar">
-                  </div>
-                  <div class="user-pane__content">
-                    <div class="user-pane__title">
-                      Your user-paneor Name
-                    </div>
-                    <div class="board-video__name">Rock</div>
-                  </div>
+        <div class="board__item" v-if="false">
+          <div class="board-video" style="background-image: url('images/video-1.jpg')">
+            <div class="user-pane">
+              <div class="user-pane__avatar">
+                <img src="images/avatar.jpg" alt="avatar">
+              </div>
+              <div class="user-pane__content">
+                <div class="user-pane__title">
+                  Your user-paneor Name
                 </div>
-                <img class="board-video__play" src="images/play.svg" alt="">
-                <a class="board-video__btn btn" href="#" @click="active=4; genreName='rock'">Choose</a>
+                <div class="board-video__name">EDM</div>
               </div>
             </div>
-            <div class="board__item" v-if="active==0">
+            <img class="board-video__play" src="images/play.svg" alt="">
+            <a class="board-video__btn btn" href="#" @click="active=1; genreName='edm';">Choose</a>
+          </div>
+        </div>
+
+        <div class="board__item" v-if="false">
+          <div class="board-video" style="background-image: url('images/video-2.jpg')">
+            <div class="user-pane">
+              <div class="user-pane__avatar">
+                <img src="images/avatar.jpg" alt="avatar">
+              </div>
+              <div class="user-pane__content">
+                <div class="user-pane__title">
+                  Your user-paneor Name
+                </div>
+                <div class="board-video__name">Instrumental</div>
+              </div>
+            </div>
+            <img class="board-video__play" src="images/play.svg" alt="">
+            <a class="board-video__btn btn" href="#" @click="active=2; genreName='instrumental'">Choose</a>
+          </div>
+        </div>
+
+        <div class="board__item" v-if="active==0">
+          <div class="board-video" style="background-image: url('images/video-1.jpg')">
+            <div class="user-pane">
+              <div class="user-pane__avatar"><img src="images/avatar.jpg" alt="avatar"></div>
+              <div class="user-pane__content">
+                <div class="user-pane__title">Inspired by Amber Selection</div>
+                <div class="board-video__name">Pop</div>
+              </div>
+            </div>
+            <img class="board-video__play" src="images/play.svg" alt="">
+            <a class="board-video__btn btn" href="#" @click="active=3; genreName='pop'">GET YOUR REMIX</a>
+          </div>
+        </div>
+
+        <div class="board__item" v-if="false">
+          <div class="board-video" style="background-image: url('images/video-1.jpg')">
+            <div class="user-pane">
+              <div class="user-pane__avatar">
+                <img src="images/avatar.jpg" alt="avatar">
+              </div>
+              <div class="user-pane__content">
+                <div class="user-pane__title">
+                  Your user-paneor Name
+                </div>
+                <div class="board-video__name">Rock</div>
+              </div>
+            </div>
+            <img class="board-video__play" src="images/play.svg" alt="">
+            <a class="board-video__btn btn" href="#" @click="active=4; genreName='rock'">Choose</a>
+          </div>
+        </div>
+
+        <div class="board__item" v-if="active==0">
                 <div class="board-video">
                   <div class="user-pane">
                     <div class="user-pane__avatar">
@@ -110,8 +106,21 @@
 <!--                  <a class="board-video__btn btn btn-grey" href="#">edit</a>-->
                 </div>
               </div>
+
+        <div class="board__item" v-if="active==0">
+          <div class="board__img">
+            <img src="images/board-2.jpg" alt="">
+          </div>
+        </div>
+
+        <div class="board__item board__item--main" v-if="active==0">
+          <div class="board__welcome">
+            <div class="board__title"><!--Welcome to&nbsp;Soundtastes--></div>
+          </div>
+        </div>
       </div>
     </section>
+
     <section class="remix-intro board" v-if="false">
       <div class="remix-intro__body" style="background-image: url('images/remix-intro.jpg')">
         <div class="remix-intro__content">
@@ -197,7 +206,7 @@
             </a>
           </div>
           <a class="footer__share btn btn-square" href="#">
-            <span>Share</span>
+            <span>GET YOUR REMIX</span>
             <svg
                     width="24"
                     height="24"
@@ -237,3 +246,19 @@ export default {
   },
 }
 </script>
+
+<style>
+  .board__item.board__item--main {
+    position: relative;
+  }
+
+  .text-over-img {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    max-width: 340px;
+    font-weight: 600;
+    font-size: 30px;
+    color: #fff;
+  }
+</style>

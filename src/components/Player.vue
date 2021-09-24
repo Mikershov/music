@@ -1,9 +1,5 @@
 <template>
   <div class="remix">
-<pre>
-{{sounds}}
-</pre>
-
     <audio :id="'mainLine_'+genreName" :src="`samples-mp3/${genreName}/${mainLine.name}/${mainLine.file}`"></audio>
 
     <div  class="remix__header">
@@ -46,13 +42,14 @@
                 <img src="images/trash.svg" alt="" />
               </button>
             </div>
+
             <input :disabled="mainLine.playing" class="volume" :class="{'volume-block':mainLine.playing}" :id="'volume_'+sound.id+'_'+genreName" type="range" name="volume" min="0" max="1"  step="0.01">
           </div>
 
           <audio v-for="(item, index) in genre.sounds" :key="sound.id+'_'+index" :id="'line_'+sound.id+'_'+item.icon+'_'+genreName" :src="`samples-mp3/${genreName}/${index}/${item.file}`"></audio>
 
           <div class="remix__canvas">
-            <button @click="clearSublineTimes(sound)" class="remix-tools__record">
+            <button :disabled="sound.record" @click="clearSublineTimes(sound)" class="remix-tools__record sub-records-clean">
               <i  class="fas fa-trash"></i>
             </button>
 
@@ -65,17 +62,17 @@
 
           <div v-if="sounds.length !==0" class="remix-tools__block">
             <ul class="remix-tools__items">
-              <li v-for="soundToAdd in addSoundList" :key="soundToAdd.icon" class="remix-tools__item" :class="{'subline-block':mainLine.playing}">
-                <a @click.prevent="addLine(sound, soundToAdd)" class="remix-tools__link" v-bind:class="{'sound-activ':checkActiveSound(sound, soundToAdd)}" href="#">
+              <li v-for="soundToAdd in addSoundList" :key="soundToAdd.icon" class="remix-tools__item" :class="{'subline-block':mainLine.playing || sound.subPlaying}">
+                <a @click.prevent="addLine(sound, soundToAdd)" class="remix-tools__link" v-bind:class="{'sound-activ':checkActiveSound(sound, soundToAdd), 'sound-inactive':checkInactiveSound(sound, soundToAdd)}" href="#">
                   <span :class="'remix-tools__icon remix-tools__icon--'+soundToAdd.icon"></span>
                 </a>
               </li>
             </ul>
 
-            <div v-if="false">
+            <div v-if="sound.data && !mainLine.playing">
               <button @click="subLinePlay(sound)" class="remix-tools__record">
-                <i  class="fas fa-play"></i>
-                <i v-show="sound.playing" class="fas fa-stop"></i>
+                <i v-show="!sound.subPlaying" class="fas fa-play"></i>
+                <i v-show="sound.subPlaying" class="fas fa-stop"></i>
               </button>
             </div>
 
@@ -100,6 +97,10 @@
         </button>
       </div>
     </div>
+
+<!--<pre>
+{{sounds}}
+</pre>-->
   </div>
 </template>
 
@@ -206,7 +207,7 @@ export default {
     //добавление пустой саб-линии в локальную структуру линий this.sounds
     addSound() {
       this.soundCounter++;
-      this.sounds.push({id:this.soundCounter, data:null})
+      this.sounds.push({id:this.soundCounter, data:null, playTimes:[], refresh:0, source: {}, subPlaying:false})
     },
 
     deleteSound(sound) {
@@ -222,7 +223,11 @@ export default {
       }
 
       //не идет ли воспроизведение
-      if(sound.playing) {
+      if(this.mainLine.playing) {
+        return false;
+      }
+
+      if(sound.subPlaying) {
         return false;
       }
 
@@ -230,8 +235,6 @@ export default {
         sound.playing = false;
         sound.record = false;
         sound.slider = 1;
-        sound.timeStart = null;
-        sound.timeEnd = null;
         sound.data = soundToAdd;
         sound.playTimes = [];
         setTimeout(() => {this.lineGenerate(sound)}, 100);
@@ -241,6 +244,14 @@ export default {
     //проверка выбран ли уже инструмент для саблинии
     checkActiveSound(sound, soundToAdd) {
       return sound?.data?.icon===soundToAdd.icon
+    },
+
+    checkInactiveSound(sound, soundToAdd) {
+      if(sound?.data) {
+         return sound?.data?.icon!==soundToAdd.icon
+      }
+
+      return false;
     },
 
     //подключение к заполненной саблинии исчтоника звука и логики воспроизведения
@@ -263,14 +274,13 @@ export default {
       sound.source.addEventListener('ended', () => {
         sound.playing = false;
         sound.source.currentTime = 0;
+        sound.subPlaying = false;
       }, false);
     },
 
     lineRecord(sound) {
       sound.record = true;
-      sound.timeStart = this.mainLine.source.currentTime;
       sound.source.volume = sound.volumeBack;
-
       sound.playTimes.push({start:this.mainLine.source.currentTime, end:null, status: 'wait'});
     },
 
@@ -298,6 +308,10 @@ export default {
         this.mainLine.source.play();
         this.mainLine.playing = true;
 
+        this.sounds.forEach(sound => {
+          sound.subPlaying = false;
+        });
+
         this.subLinesAllPlay();
       } else {
         this.mainLine.source.pause();
@@ -310,7 +324,7 @@ export default {
 
     subLinesAllPlay(status = true) {
       this.sounds.forEach(sound => {
-        if(sound.source) {
+        if(sound.data) {
           if(status) {
             sound.source.play();
             sound.source.volume = 0;
@@ -321,7 +335,7 @@ export default {
             sound.source.volume = sound.volumeBack;
             sound.playing = false;
             sound.record = false;
-            
+
             sound.playTimes.forEach(time => {
               time.status = 'wait';
             });
@@ -330,13 +344,25 @@ export default {
       });
     },
 
-    subLinePlay() {
+    subLinePlay(sound) {
+      if (this.auCon.state === 'suspended') {
+        this.auCon.resume();
+      }
 
+      if(sound.subPlaying) {
+        sound.subPlaying = false;
+        this.subLinesAllPlay(false);
+      } else {
+        sound.subPlaying = true;
+        sound.source.currentTime = 0;
+        sound.source.volume = 1;
+        sound.source.play();
+      }
     },
 
     clearSublineTimes(sound) {
-      console.log('clear')
       sound.playTimes = [];
+      sound.filed = 0;
     },
 
     loop() {
@@ -356,18 +382,12 @@ export default {
             if(time.start !== time.end && this.mainLine.playing && !sound.record) {
               if(this.mainLine.source.currentTime >= time.start && this.mainLine.source.currentTime <= time.end) {
                 if(time.status === 'wait') {
-                  console.log('start', time)
+                  //console.log('start', time)
                   time.status = 'play';
                   sound.source.volume = sound.volumeBack;
                 }
-
-                /*if(this.mainLine.source.currentTime > time.end && sound.source.volume !== 0) {
-                  console.log('stop')
-                  sound.source.volume = 0;
-                }*/
-
               } else if(time.status === 'play') {
-                console.log('stop', time)
+                //console.log('stop', time)
                 time.status = 'done';
                 sound.source.volume = 0;
               }
@@ -377,10 +397,16 @@ export default {
       });
 
       //запись линий
-      this.sounds.forEach(item => {
-        if(item.record) {
-          item.timeEnd = this.mainLine.source.currentTime;
-          item.playTimes[item.playTimes.length-1].end = this.mainLine.source.currentTime;
+      this.sounds.forEach(sound => {
+        if(sound.record) {
+          sound.playTimes[sound.playTimes.length-1].end = this.mainLine.source.currentTime;
+
+          /*let locStart = sound.playTimes[sound.playTimes.length-1].start;
+          sound.playTimes.forEach(time => {
+            if(locStart >= time.start && locStart <= time.end && time.start !== locStart) {
+              console.log('overlay', locStart, time)
+            }
+          });*/
         }
       });
 
@@ -418,6 +444,10 @@ export default {
       });
 
       return globalSounds > this.sounds.length;
+    },
+
+    refreshSoundData(sound) {
+      sound.refresh===0?sound.refresh=1:sound.refresh=0;
     }
   },
 
@@ -542,6 +572,18 @@ export default {
 
   .subline-block {
     opacity: 0.5;
+  }
+
+  .sub-records-clean {
+    position: absolute;
+    right: 3px;
+    height: 25px;
+    width: 25px;
+    top: -8px;
+  }
+
+  .sound-inactive {
+    opacity: 0.7;
   }
 </style>
 
