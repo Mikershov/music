@@ -89,7 +89,7 @@
           </div>
         </div>
 
-        <div class="board__item" v-if="active==0">
+        <div class="board__item" v-if="false">
                 <div class="board-video">
                   <div class="user-pane">
                     <div class="user-pane__avatar">
