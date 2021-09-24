@@ -192,15 +192,18 @@ export default {
     this.mainLine.barHeight = '';
     this.mainLine.x = 0;
 
+    //автоматические добавление саблиний в звуки
+    this.preSetupSubLines();
+
     //таймеры и визуализация
     this.loop();
 
     //для удобства воспроизведение по спейсу
-    document.body.onkeyup = (e) => {
+    /*document.body.onkeyup = (e) => {
       if(e.code === 'Space') {
         this.mainLinePlay();
       }
-    }
+    }*/
   },
 
   methods: {
@@ -217,6 +220,7 @@ export default {
 
     //добавление данных в саблинии (выбранный звук)
     addLine(sound, soundToAdd) {
+      console.log(sound, soundToAdd)
       //не нажата ли кнопка звука уже
       if(this.sounds.find(s => s?.data?.soundName === soundToAdd.soundName)) {
         return false;
@@ -448,6 +452,19 @@ export default {
 
     refreshSoundData(sound) {
       sound.refresh===0?sound.refresh=1:sound.refresh=0;
+    },
+
+    preSetupSubLines() {
+      this.addSoundList.forEach(soundToAdd => {
+        this.addSound();
+        this.addLine(this.sounds[this.sounds.length-1], soundToAdd);
+      });
+
+      /*Object.keys(this.genre.sounds).forEach(item => {
+        if(this.genre.sounds[item].icon !== 'main') {
+          //sounds.push(Object.assign({soundName:item},this.genre.sounds[item]));
+        }
+      });*/
     }
   },
 
